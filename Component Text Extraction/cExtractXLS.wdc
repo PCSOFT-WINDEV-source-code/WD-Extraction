@@ -1,0 +1,145 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : cExtractXLS
+ major_version : 28
+ minor_version : 0
+ type : 4
+ description : ""
+ subtype : 0
+class :
+ identifier : 0x19ad6bf9007fa087
+ internal_properties : CAAAAAgAAAB2/vstTMCJbS/hlxjFxirSqKvCUuv8YxgpWyl7S3iA
+ code_elements :
+  internal_properties : CAAAAAgAAABaFiBew9g4k/kkfqEz1ZrK0GKl1rotIBteUQYlGI/Y+lSXTNznTiMKQUZIxa35Wct1bPurw/pS4gZL8dw3bSiOpYZhMkk/suq4isPBeyaDpfh76ZmNM5a50tgZ0W2AzBVnm6EHeJR02u2/k7N321y/xdjhhZQw4ksQ5nYaykeSzle4UFxQxmfdf2J4BoO1m8nPSw==
+  type_code : 10
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAADKZYlLkN3ztmxjtoGGYvOnmiQWYVGQ4EzcjC18NKHAcf7jLM7f1SEYUNhF7YdopGZ26ZGFwahEiWXQD18EKDPxggj6WoBPCJbl1TNPjKrSHzIjVaxj2gL/feHxQToO5MTtSVtvJdibHNeCWIo2gLoZx8uaBxHv8mEKrrgu/v+qvslkUPlawrZH8yhDlYeOpe+b116f4WZNPWH1MTLcnw+hw/8dNM+M7KjCm8ixWbr7cFB7suDU9DA5Lsyl8zBEYoXF7zUSkZAqJ06HQGj/tjeTD/J0dIzrT7gdPxI1B5hKys1NgiWA7Uz+zR1iDRNKWCyRSGLFcrLWsu0Zy9L81XmWdMSoQL1vdM+muZx3zni+6OaYYUHl
+     code : |1+
+      CONSTANT
+      	EXTENSION        = ".xls"
+      END
+      
+      // 
+      // Class used to retrieve the text found in an Excel document (before 2007)
+      //
+      cExtractXLS is Class
+      	inhérits of cExtractor
+      	
+      PRIVATE
+      	_oExcelAutomation is object OLE dynamic
+      END
+      
+     type : 131072
+  procedures :
+   -
+     name : Manufacturer
+     procedure_id : 1850253739118600358
+     type_code : 27
+     code : |1+
+      PROCEDURE Constructor()
+      
+     type : 589824
+   -
+     name : Destructor_
+     procedure_id : 1850253739118665894
+     type_code : 28
+     code : |1+
+      PROCEDURE Destructor()
+      
+     type : 655360
+   -
+     name : getExtension
+     procedure_id : 1850254413429409778
+     type_code : 12
+     code : |1-
+      // Summary: <specify the action of the procedure>
+      // Syntax:
+      //[ <Result> = ] getExtension ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	string:  // 	 	 None
+      //// Example:
+      // Indicate an example.
+      //
+      PROCEDURE VIRTUAL getExtension()
+      
+      RESULT EXTENSION
+     type : 458752
+   -
+     name : ExtractText
+     internal_properties : CAAAAAgAAADm5M5UDdasDMYk2wFzMOTwNV1bun+q67TeKzTFWVZvhkON4fT4Se+5vCn4R2FZP5MI6R8mCD+OVB7Cz/89QyhKGMkGaOKV1U4M99oXSQxx0iTBrWB+DFoET1vRineVzoyzGHN9A0V2LuZqhkQZ+i+fOpBTq8tZT97UzZ3MvUD07x+zodjz4Hx5IqbbHDhfr6l5gvHqt9MEFMJbCSpA1/MY0s0Qbdlxla6oSxrxIDZDevU/cSLK1NGfwrtkNYE0HagyRyrUoEANAc+rN0A8ihmIsvXPYBPzUzwheQnwVsCM0ENFZ8AC2kaTY81I04bB8GiEiUU=
+     procedure_id : 1850254520803682105
+     type_code : 12
+     code : |1-
+      // Summary: <specify the action of the procedure>
+      // Syntax:
+      //[ <Result> = ] ExtractText (<sPath> is string [, <sOutput>])
+      //
+      // Parameters:
+      //	sPath (string): <specify the role of sPath>
+      //	sOutput: <specify the role of sOutput>
+      // Return value:
+      // 	boolean: // 	None
+      //// Example:
+      // Indicate an example.
+      //// Automatic process of exceptions:   run CASE EXCEPTION:
+      //
+      PROCEDURE VIRTUAL ExtractText(sPath is string,sExit="")
+      
+      
+      <if ExecutionTarget=ApplicationWindows or ExecutionTarget=ServiceWindows>
+      	
+      	// Variables
+      	sTextFile is string = CompleteDir(fExeDir())+Today()+"_"+Now()+".txt"
+      	oDocument     is object OLE dynamic
+      	
+      	// Is an automation object already allocated?
+      	IF :_oExcelAutomation = Null THEN
+      		:_oExcelAutomation = GetActiveObject("Excel.Application")
+      		IF :_oExcelAutomation = Null THEN
+      			// No Excel is already opened, allocate one 
+      			:_oExcelAutomation = new object OLE "Excel.Application"
+      		END
+      	END
+      	
+      	// Excel is invisible
+      	:_oExcelAutomation>>Visible = False
+      	
+      	// Open the file with this Excel
+      	oDocument = :_oExcelAutomation>>WorkBooks>>Open(sPath)
+      	oDocument>>SaveAs(sTextFile,36)
+      	
+      	// Close the file
+      	oDocument>>Close(False,sPath)
+      	
+      	// Load the text file
+      	:_sText = fLoadText(sTextFile)
+      	
+      	// Delete the temporary file
+      	fDelete(sTextFile)
+      	
+      <end>
+      
+      
+      
+      RESULT True
+      
+      CASE EXCEPTION:
+      	:_sError = ErrorInfo(errFullDetails)
+      	RESULT False
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : CClasse1
+resources :
+ string_res :
+  identifier : 0x19ad6bf9007ca078
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

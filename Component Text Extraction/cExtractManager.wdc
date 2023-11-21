@@ -1,0 +1,268 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : cExtractManager
+ major_version : 28
+ minor_version : 0
+ type : 4
+ description : ""
+ subtype : 0
+class :
+ identifier : 0x18bbe71a00333cfc
+ internal_properties : CAAAAAgAAAB2/vstTMCJbS/hlxjFxirSqKvCUuv8YxgpWyl7S3iA
+ code_elements :
+  type_code : 10
+  p_codes :
+   -
+     code : |1-
+       
+      //
+      // Manager of extractor
+      // This class is used to centralize the management of the extractors
+      //
+      cExtractManager is Class
+      	PRIVATE
+      		_listExtractor is ASSOCIATIVE ARRAY of cExtractor dynamic
+      		_bError         is boolean = False
+      		_sErrorMsg      is string
+      END
+       
+       
+     type : 131072
+  procedures :
+   -
+     name : Manufacturer
+     procedure_id : 1782272176413752587
+     type_code : 27
+     code : |1+
+      PROCEDURE Constructor( )
+      
+      // Fill the extractors that we can do
+      :_listExtractor[cExtractDOCX::EXTENSION] = new cExtractDOCX
+      :_listExtractor[cExtractODT::EXTENSION] = new cExtractODT
+      :_listExtractor[cExtractHTML::HTM_EXTENSION] = new cExtractHTML
+      :_listExtractor[cExtractHTML::HTML_EXTENSION] = new cExtractHTML
+      :_listExtractor[cExtractPDF::EXTENSION] = new cExtractPDF
+      :_listExtractor[cExtractRTF::EXTENSION] = new cExtractRTF
+      
+      
+      <if ExecutionTarget=ApplicationWindows or ExecutionTarget=WebserviceWindows or ExecutionTarget=ServiceWindows>
+      	
+      	:_listExtractor[cExtractDOC::EXTENSION] = new cExtractDOC
+      	:_listExtractor[cExtractXLS::EXTENSION] = new cExtractXLS
+      	
+      <end>
+      
+      
+     type : 589824
+   -
+     name : Destructor_
+     procedure_id : 1782272176413818123
+     type_code : 28
+     code : |1+
+      PROCEDURE Destructor()
+      
+     type : 655360
+   -
+     name : Extract
+     procedure_id : 1782272352507583670
+     type_code : 12
+     code : |1+
+      // Summary: Extracts and returns the text found in a file
+      // Syntax:
+      //[ <Result> = ] Extract (<sPath> is string [, <sOutput>])
+      //
+      // Parameters:
+      //	sPath (ANSI string): Location of the file
+      //	sOutput (default value=""): Use for cExtractTool
+      // Return value:
+      // 	ANSI string:       // None
+      //// Example:
+      // Extract("page.html")
+      //
+      FUNCTION Extract ( sPath is string , sExit = "" )
+      
+      // Variable
+      sExtension    is string
+      sArchiveName   is string
+      
+      // Initialization
+      sExtension = fExtractPath(sPath,fExtension)
+      sArchiveName = "MainArchive_"+Now()
+      
+      // If it's a ZIP file, special case, list the files that can be managed and return all the texts
+      IF sExtension = ".zip" THEN
+      	// Variable
+      	nOpenArchive is int
+      	sListFile is string
+      	sFile      is string
+      	sText        is string
+      	
+      	// The files found in the zip must be listed
+      	
+      	// Open the archive
+      	nOpenArchive = zipOpen(sArchiveName,sPath)
+      	
+      	IF nOpenArchive = 0 THEN	
+      		// Returns the list of files found in the archive
+      		sListFile = zipListFile(sArchiveName)
+      		
+      		// Extract the file and read its content if it can be managed
+      		FOR EACH string sFile of sListFile SEPAREE by CR
+      			sExtension = fExtractPath(sFile,fExtension)	
+      			IF NOT(:_listExtractor[sExtension]..Empty) THEN
+      				// Extract
+      				zipExtractFile(sArchiveName,sFile,zipNone)
+      				
+      				// Retrieve the text
+      				IF :_listExtractor[sExtension].ExtractText(sFile,sExit) THEN				
+      					sText += :_listExtractor[sExtension].getText()
+      				END
+      			END
+      		END
+      		
+      		// Close the archive
+      		zipClose(sArchiveName)
+      	END
+      	
+      	RESULT sText
+      	
+      // Otherwise, test as usual
+      ELSE IF :_listExtractor[sExtension]..Empty THEN
+      	:_bError = True
+      	:_sErrorMsg = <§$0001§>
+      	RESULT ""
+      ELSE
+      	IF :_listExtractor[sExtension]:ExtractText(sPath,sExit) THEN
+      		RESULT :_listExtractor[sExtension]:getText() 
+      	ELSE	
+      		:_bError = True
+      		:_sErrorMsg = :_listExtractor[sExtension]:getLastError()
+      		RESULT ""
+      	END
+      END
+     type : 458752
+   -
+     name : SpecifyTool
+     procedure_id : 1782272580141690165
+     type_code : 12
+     code : |1+
+      // Summary: Used to specify an external tool that will be call to extract some files
+      // Syntax:
+      //SpecifyTool (<sExtension> is string, <sTool> is string, <sCommand> is string)
+      //
+      // Parameters:
+      //	sExtension (string): extensions of the files that will be extracted by the tool
+      //	sTool (string): Location of the tool
+      //	sCommand (string): Command line of the tool
+      // Return value:
+      // 	None
+      //// Example:
+      // Indicate an example.
+      //
+      PROCEDURE SpecifyTool ( sExtension is string , sTool is string , sCommand is string )
+      
+      // Variable
+      pclExtractTool is cExtractTool dynamic
+      
+      // Initialization, add quotes at the beginning and at the end if space characters are found in the path of the tool
+      pclExtractTool = new cExtractTool(sExtension, """"+sTool+"""",sCommand)
+      
+      // Insert a new external extractor that may overwrite an internal extractor
+      :_listExtractor[sExtension] = pclExtractTool
+      
+     type : 458752
+   -
+     name : getListType
+     procedure_id : 1782315293593135881
+     type_code : 12
+     code : |1-
+      // Summary: Returns the list of supported extensions
+      // Syntax:
+      //[ <Result> = ] getTypeList ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	string:  // List of supported extensions
+      //// Example:
+      // Indicate an example.
+      //
+      FUNCTION getListType ( )
+      
+      // Variable
+      sList      is string
+      cExtractTmp is cExtractor dynamic
+      
+      // Browse the list of classes
+      FOR ALL ELEMENT cExtractTmp of :_listExtractor
+      	sList += cExtractTmp:getExtension() + CR
+      END
+      
+      RESULT sList
+     type : 458752
+   -
+     name : getErrorInformation
+     procedure_id : 1850251591631438093
+     type_code : 12
+     code : |1+
+      // Summary: <specify the action of the procedure>
+      // Syntax:
+      //[ <Result> = ] getInformationError ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	string: //  	 	None
+      //// Example:
+      // Indicate an example.
+      //
+      PROCEDURE getErrorInformation()
+      
+      RESULT :_sErrorMsg
+     type : 458752
+   -
+     name : getEncounteredError
+     procedure_id : 1850251664645964349
+     type_code : 12
+     code : |1+
+      // Summary: <specify the action of the procedure>
+      // Syntax:
+      //[ <Result> = ] getErrorRaised ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	boolean: // 	None
+      //// Example:
+      // Indicate an example.
+      //
+      PROCEDURE getEncounteredError()
+      
+      // Variable
+      bError is boolean = :_bError
+      
+      :_bError = False
+      
+      RESULT bError
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : CClasse1
+resources :
+ string_res :
+  identifier : 0x18bbe70c0030060d
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      en-GB : "Error: Type of file not supported"
+     index : 0
+   -
+     text :
+      en-GB : "Error: Type of file not supported"
+     index : 1
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

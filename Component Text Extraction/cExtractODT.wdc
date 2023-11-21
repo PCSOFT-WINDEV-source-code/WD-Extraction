@@ -1,0 +1,201 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : cExtractODT
+ major_version : 28
+ minor_version : 0
+ type : 4
+ description : ""
+ subtype : 0
+class :
+ identifier : 0x18bc0a1a0068f6d0
+ internal_properties : CAAAAAgAAAB2/vstTMCJbS/hlxjFxirSqKvCUuv8YxgpWyl7S3iA
+ code_elements :
+  internal_properties : CAAAAAgAAABm4PVFe9JAHaoZ7pWrapr167xJBrSdz0axAnnnfYhOQaaZf6aFmw+87+hdnze0968KI3y7g0wMbri74fT3L3UE/39pGg==
+  type_code : 10
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAAC3nu1hSNkqhpRFDp61ZpKup/EQQfMrbsRNkzNpGpKMXmRTAI7XyH9LimGgHJnGkKWoafCDled5zUP+AWTSs8lK2wLbs6hAJEi9jxqqA/OR7JF/SW/DCkj5B8NfzGHTrWv74CosEBzux1yumq590zw0BHUysrZPKe2r846bzPoA
+     code : |1+
+      CONSTANT
+      	EXTENSION       = ".odt"
+      	DATA_FILE = "content.xml"	
+      END
+      
+      // 
+      // Class used to retrieve the text found in an Open Office document (.odt)
+      //
+      cExtractODT is Class
+      	inhérits of cExtractor
+      END
+      
+     type : 131072
+  procedures :
+   -
+     name : Manufacturer
+     procedure_id : 1782310659324245712
+     type_code : 27
+     code : |1+
+      // Summary: <specify the action of the procedure>
+      // Syntax:
+      // cExtractODT()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	None
+      //
+      // Example:
+      // Indicate an example.
+      //
+      PROCEDURE Constructor()
+      
+     type : 589824
+   -
+     name : Destructor_
+     procedure_id : 1782310659324311248
+     type_code : 28
+     code : |1+
+      // Summary: <specify the action of the procedure>
+      // Syntax:
+      // cExtractODT ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	None
+      //
+      // Example:
+      // Indicate an example.
+      //
+      PROCEDURE Destructor()
+      
+     type : 655360
+   -
+     name : ExtractText
+     internal_properties : CAAAAAgAAABkYLI1Iua2HfmeBp5O1829w7rM9ucpI5Kl1JWuhMt3N/odRnG30wEg5C3sTK17QH1IVSnZx9o4fOVNPpuH1NXFCps6Z6tXX8KX6XXRYg5yPxSRRbZlHGmRGTgMCLJcHn15a9HnPYsdhmw3apNMaVTJ12LxfAbf6Sgwgr0vQaBkfhiowgdrnZqnh6zYIw5d2aH1J1Px71GmKLLdR4bIsB9MHKAXztnH6pFwuyh5iRuV5ySGpp0v4S21/YeNZ1UXYESoyThzwUyAdKRLuEfflUnJCHlehdwXMxMtY8RZzevy/gwpAb9QMpDLHAKYD8CZT777gBoOqGER1fDzWAM=
+     procedure_id : 1782310659324376784
+     type_code : 12
+     code : |1-
+      // Summary: Extracts the text from an Open Office document
+      // Syntax:
+      //[ <Result> = ] ExtractText (<sPath> is string [, <sOutput>])
+      //
+      // Parameters:
+      //	sPath (string): Path of the file
+      //	sOutput: useful for cExtractTool only
+      // Return value:
+      // 	boolean:     // 	None
+      //// Example: ExtractText("D:/file.odt")
+      //// Automatic process of exceptions:   run CASE EXCEPTION:
+      //
+      
+      PROCEDURE VIRTUAL ExtractText(sPath is string,sExit="")
+      
+      // Variables
+      nOpenArchive   is int
+      sText          is string
+      sLine          is string
+      sResult       is string
+      nStartPosition  is int
+      nEndTagBeginning is int
+      nEndPosition    is int
+      sArchiveName     is string
+      
+      // Initialization
+      sArchiveName = "ArchiveODT_"+Now()
+      
+      // Specify the file
+      IF sPath <> "" THEN
+      	:_sPath = sPath
+      END
+      
+      // Is is an Open Office file?
+      IF fExtractPath(:_sPath,fExtension) <> ::EXTENSION THEN
+      	:_sError = <§$0000§>
+      	RESULT False
+      END
+      
+      // Unzip the file
+      nOpenArchive = zipOpen(sArchiveName, :_sPath)
+      IF nOpenArchive = 0 THEN
+      	// Extract a file into its initial location
+      	sText = zipExtractFile(sArchiveName, ::DATA_FILE, zipInMemory)
+      ELSE
+      	:_sError = <§$0001§>+:_sPath
+      	RESULT False
+      END
+      
+      // Close the zip file
+      zipClose(sArchiveName)
+      
+      // Loop and extract the values found between the tags that indicate some text
+      nStartPosition = Position(sText,"<text:p")
+      WHILE nStartPosition <> 0
+      	// Define the end of the start tag (its size may change)
+      	nEndTagBeginning = Position(sText,">",nStartPosition) 
+      	
+      	// Define the end of the text
+      	nEndPosition = Position(sText,"</text:p>",nStartPosition)
+      	
+      	// Retrieve the text as the start and end positions are identified
+      	sLine = sText[[nEndTagBeginning+1 TO nEndPosition-1]]
+      	IF NOT (sLine [= "<text") THEN
+      		sResult += CR
+      		sResult += sLine
+      	END
+      	
+      	// Next tag
+      	nStartPosition = Position(sText,"<text:p",nStartPosition+1)
+      END
+      
+      // Specify the extracted text
+      :_sText = XMLToText(UTF8ToString(sResult))
+      
+      RESULT True
+      
+      CASE EXCEPTION:
+      	:_sError = ErrorInfo(errFullDetails)
+      	RESULT False
+     type : 458752
+   -
+     name : getExtension
+     internal_properties : CAAAAAgAAAB/QxmAHc0G3ZiNhx7bE0wMolVFV3YVWfy9sGYv2rOXrI77y3+TaiWe+MIxT70/Gq2D8i60e9DXVU72lxl/lO3sgDiaw52uz0rXrGGx95m+kT43SOumyH/w7zrKcbTANH0fWgiHab9pvsO48ERjTHcGiw18xv23ig0HGo6/PpLYEUTcSdIQ+CKj0UBlVZN0XYOu7XEE
+     procedure_id : 1782315074548835156
+     type_code : 12
+     code : |1-
+      // Summary: Returns the extension of an Open Office document
+      // Syntax:
+      //[ <Result> = ] getExtension ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	string: //  	 	None
+      //// Example:
+      // Indicate an example.
+      //
+      PROCEDURE VIRTUAL getExtension()
+      
+      RESULT ::EXTENSION
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : CClasse1
+resources :
+ string_res :
+  identifier : 0x18bbb9cf000e5023
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+  strings :
+   -
+     text :
+      en-GB : This file is not an Open Office file
+     index : 0
+   -
+     text :
+      en-GB : "Unable to unzip the archive "
+     index : 1
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

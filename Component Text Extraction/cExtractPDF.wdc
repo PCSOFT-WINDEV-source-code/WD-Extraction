@@ -1,0 +1,116 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : cExtractPDF
+ major_version : 28
+ minor_version : 0
+ type : 4
+ description : ""
+ subtype : 0
+class :
+ identifier : 0x18fc83b7008e9ab2
+ internal_properties : CAAAAAgAAAB2/vstTMCJbS/hlxjFxirSqKvCUuv8YxgpWyl7S3iA
+ code_elements :
+  type_code : 10
+  p_codes :
+   -
+     internal_properties : CAAAAAgAAABzRaU974F/VtFqh8hsZwbfsSvubMa3R4sJ8EsmiNVJiZvW2NglwnWhEvlP1oyyS5wBvFjUxhqZXS3014hlayfLYup7ju7ze913STH/A4VJWWgiGzJ39i1MB9/k3+SENKe2Yjbsq7PRa8ueTxQ=
+     code : |1+
+      
+      CONSTANT
+      	EXTENSION = ".pdf"
+      END
+      
+      // 
+      // Class used to retrieve the text from a PDF document
+      //
+      cExtractPDF is Class
+      	inhérits of cExtractor
+      END
+      
+     type : 131072
+  procedures :
+   -
+     name : Manufacturer
+     procedure_id : 1800458773053020850
+     type_code : 27
+     code : |1+
+      PROCEDURE Constructor()
+      
+     type : 589824
+   -
+     name : Destructor_
+     procedure_id : 1800458773053086386
+     type_code : 28
+     code : |1+
+      PROCEDURE Destructor()
+      
+     type : 655360
+   -
+     name : getExtension
+     internal_properties : CAAAAAgAAAB/QxmAHc0G3ZiNhx7bE0wMolVFV3YVWfy9sGYv2rOXrI77y3+TaiWe+MIxT70/Gq2D8i60e9DXVU72lxl/lO3sgDiaw52uz0rXrGGx95m+kT43SOumyH/w7zrKcbTANH0fWgiHab9pvsO48ERjTHcGiw18xv23ig0HGo6/PpLYEUTcSdIQ+CKj0UBlVZN0XYOu7XEE
+     procedure_id : 1800458863248403736
+     type_code : 12
+     code : |1-
+      // Summary: Returns the extension of a PDF file
+      // Syntax:
+      //[ <Result> = ] getExtension ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	string: //  	 	None
+      //// Example:
+      // Indicate an example.
+      //
+      PROCEDURE VIRTUAL getExtension()
+      
+      RESULT ::EXTENSION
+     type : 458752
+   -
+     name : ExtractText
+     internal_properties : CAAAAAgAAACsceOjUs6RrRqEgzPIIQceKZ19B54EhCmpE8Wa2UINKm0LP5l2QjhVHmk3PZFtRy26MA3dxNW2FrRZ+dNmWXOwUlvVLWCwja0X/cHy2riCOSzCAzNsu3X5rUUwxyZhcuPpXRqa0AD19tkEMoMa5R/jttyWk/tJ4bvA/R/FlxnnvX5KyOirt5NH5qviP6ctgwqYkopRfL7XBGII56Ai0nAQh0YODLeLSur2vzrvLd+sw093pTQ3jjWe1nhjg50PDNDHeszzsDAuKpg17YRIYmPg
+     procedure_id : 1800459030752167983
+     type_code : 12
+     code : |1-
+      // Summary: Extracts the text from a PDF file
+      // Syntax:
+      //[ <Result> = ] ExtractText (<sPath> is string [, <sOutput>])
+      //
+      // Parameters:
+      //	sPath (string): Location of the PDF file
+      //	sOutput: useful for cExtractTool only
+      // Return value:
+      // 	boolean:  // True if everything is OK, False otherwise
+      //// Example:
+      // Indicate an example.
+      //// Automatic process of exceptions:   run CASE EXCEPTION:
+      //
+      
+      PROCEDURE VIRTUAL ExtractText(sPath is string , sExit = "")
+      
+      // Extract the text
+      :_sText = PDFToText(sPath)
+      
+      IF NOT ErrorOccurred() THEN
+      	RESULT True
+      ELSE
+      	:_sError = ErrorInfo()
+      	RESULT False
+      END
+      
+      CASE EXCEPTION:
+      	:_sError = ErrorInfo(errFullDetails)
+      	RESULT False
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : CClasse1
+resources :
+ string_res :
+  identifier : 0x18fc83a3008b4dea
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

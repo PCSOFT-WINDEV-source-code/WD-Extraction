@@ -1,0 +1,165 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : cExtractor
+ major_version : 28
+ minor_version : 0
+ type : 4
+ description : ""
+ subtype : 0
+class :
+ identifier : 0x16bb0c4202e5a817
+ internal_properties : CAAAAAgAAAB2/vstTMCJbS/hlxjFxirSqKvCUuv8YxgpWyl7S3iA
+ code_elements :
+  type_code : 10
+  p_codes :
+   -
+     code : |1-
+      
+      //
+      // Base class from which all the extractors inherit
+      //
+      cExtractor is Class
+      	PROTECTED
+      		_sPath is string = ""
+      		_sText  is string = ""
+      		_sError is string = ""
+      END
+       
+       
+     type : 131072
+  procedures :
+   -
+     name : Manufacturer
+     procedure_id : 1637916367135352855
+     type_code : 27
+     code : |1+
+      // Summary: <specify the action of the procedure>
+      // Syntax:
+      // cExtractor ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	None
+      //
+      // Example:
+      // Indicate an example.
+      //
+      PROCEDURE Constructor( )
+     type : 589824
+   -
+     name : Destructor_
+     procedure_id : 1637916367135418391
+     type_code : 28
+     code : |1+
+      // Summary: <specify the action of the procedure>
+      // Syntax:
+      // cExtractor ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	None
+      //
+      // Example:
+      // Indicate an example.
+      //
+      PROCEDURE Destructor()
+      
+     type : 655360
+   -
+     name : ExtractText
+     internal_properties : CAAAAAgAAABgeLhTCrXemqqklrCPwIt5pHpTAMHS74E8AihX3J+1UXcdmp/2NKaw3h/8IwfjmhohSgdqa09XjSf4b2QlDjg2FOAMK5/M7rjqPOz5phjvA8YEDL9/4lkFSixXSqCerpa7evqBml/MdzSA/s3hc/9Tm+ekUlur5Un6wNZm1wfDXmRg95qoqxsLVlIbWph1g9NT0sGbVAxuueyQdcO23O/9/y1bev2qEQynMijG+WqW
+     procedure_id : 1637916367135483927
+     type_code : 12
+     code : |1-
+      // Summary: Virtual method overloaded by each extractor
+      // Syntax:
+      //[ <Result> = ] ExtractText (<sPath> is string [, <sOutput>])
+      //
+      // Parameters:
+      //	sPath (ANSI string): <specify the role of sPath>
+      //	sOutput (default value=""): <specify the role of sOutput>
+      // Return value:
+      // 	boolean: // 	None
+      //// Example:
+      // Indicate an example.
+      //
+      PROCEDURE VIRTUAL ExtractText (sPath is string , sExit = "" )
+      
+      RESULT False
+     type : 458752
+   -
+     name : getText
+     internal_properties : CAAAAAgAAACYCrQqvShwfBb2V4e2rsGumzHoUSPVbNC5/nLl2HqYwaqxppuV9fkC6/h0beQ4oc/UV+FAqqy3ygVlyjw5vt6ToHzjCGCizTDRaqFG+oUORBMvZKhTGsYpQsiHTHq18tjqturHqtybpD24nydD
+     procedure_id : 1637916367135549463
+     type_code : 12
+     code : |1-
+      // Summary: Returns the text extracted from the file
+      // Syntax:
+      //[ <Result> = ] getText ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	string:  // 	 	 None
+      //// Example:
+      // Indicate an example.
+      //
+      FUNCTION getText ( )
+      
+      RESULT :_sText
+     type : 458752
+   -
+     name : getLastError
+     procedure_id : 1637916367135614999
+     type_code : 12
+     code : |1-
+      // Summary: Returns a string explaining the last error that occurred
+      // Syntax:
+      //[ <Result> = ] getLastError ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	string:  // Information message about the error
+      //// Example:
+      // Indicate an example.
+      //
+      FUNCTION getLastError ( )
+      
+      RESULT :_sError
+     type : 458752
+   -
+     name : getExtension
+     internal_properties : CAAAAAgAAACYCrQqvShwfBb2V4e2rsGumzHoUSPVbNC5/nLl2HqYwaqxppuV9fkC6/h0beQ4oc/UV+FAqqy3ygVlyjw5vt6ToHzjCGCizTDRaqFG+oUORBMvZKhTGsYpQsiHTHq18tjqturHqtybpD24nydD
+     procedure_id : 1637916367135680535
+     type_code : 12
+     code : |1+
+      // Summary: Returns the extension of the file used to manage the class
+      // Syntax:
+      //[ <Result> = ] getExtension ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	string:  // 	 	 None
+      //// Example:
+      // Indicate an example.
+      //
+      FUNCTION VIRTUAL getExtension ( )
+      
+      RESULT ""
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : CClasse1
+resources :
+ string_res :
+  identifier : 0x18bbb9c100071b86
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ
